@@ -5,7 +5,7 @@ function locCol(l: tiles.Location): number {
     return (l as any)._col
 }
 
-//% color=#c96a3a icon="\uf279"
+//% color=#c96a3a icon="\uf00a"
 //% groups='["Grid"]'
 namespace grid {
     export class Grid {

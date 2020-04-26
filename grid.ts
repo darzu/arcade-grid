@@ -141,6 +141,13 @@ namespace grid {
         })
     }
 
+    //% block="get sprite at $loc=mapgettile"
+    export function getSprite(loc: tiles.Location): Sprite {
+        const c = locCol(loc)
+        const r = locRow(loc)
+        return currentGrid().getSprite(c, r)
+    }
+
     //% block="array of sprites in row $row"
     export function rowSprites(row: number): Sprite[] {
         const g = currentGrid();

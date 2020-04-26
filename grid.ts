@@ -15,13 +15,15 @@ namespace grid {
 
     export class Grid {
         public sprites: Sprite[][];
+        public columns: number;
+        public rows: number;
 
         constructor(protected tm: tiles.TileMap) {
-            const columns = tm.areaWidth() >> tm.scale;
-            const rows = tm.areaHeight() >> tm.scale;
+            this.columns = tm.areaWidth() >> tm.scale;
+            this.rows = tm.areaHeight() >> tm.scale;
 
             this.sprites = []
-            for (let x = 0; x < columns; x++) {
+            for (let x = 0; x < this.columns; x++) {
                 this.sprites[x] = []
             }
         }
@@ -29,9 +31,13 @@ namespace grid {
         public place(sprite: Sprite, loc: tiles.Location) {
             if (sprite.flags & sprites.Flag.Destroyed)
                 return
-            this.remove(sprite);
             const x = locCol(loc)
+            if (x < 0 || this.columns <= x)
+                return
             const y = locRow(loc)
+            if (y < 0 || this.rows <= y)
+                return
+            this.remove(sprite);
             this.remove(this.sprites[x][y])
             this.sprites[x][y] = sprite
             const d = sprite.data()
@@ -70,8 +76,9 @@ namespace grid {
     //% block="grid location of $sprite=variables_get(mySprite)"
     export function getLocation(sprite: Sprite): tiles.Location {
         //return tiles.getTileLocation(screenCoordinateToTile(s.x), screenCoordinateToTile(s.y));
-        let r = sprite.data()[DATA_ROW]
-        let c = sprite.data()[DATA_COL]
+        const d = sprite.data()
+        const r = d[DATA_ROW]
+        const c = d[DATA_COL]
         if (r === undefined || c === undefined)
             return null
         return game.currentScene().tileMap.getTile(c, r)

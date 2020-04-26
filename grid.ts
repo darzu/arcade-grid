@@ -9,7 +9,7 @@ const DATA_ROW = "__gridRow"
 const DATA_COL = "__gridCOL"
 
 //% color=#8c6049 icon="\uf00a"
-//% groups='["Grid"]'
+//% groups='["Placement", "Movement", "Location", "Enumeration"]'
 namespace grid {
     let _currentGrid: Grid;
 
@@ -82,21 +82,25 @@ namespace grid {
     }
 
     //% block="grid columns"
+    //% group="Enumeration" blockGap=8
     export function numColumns(): number {
         return currentGrid().columns
     }
 
     //% block="grid rows"
+    //% group="Enumeration" blockGap=8
     export function numRows(): number {
         return currentGrid().rows
     }
 
     //% block="grid place %sprite=variables_get(mySprite) on top of $loc=mapgettile"
+    //% group="Placement" blockGap=8
     export function place(sprite: Sprite, loc: tiles.Location) {
         currentGrid().place(sprite, loc);
     }
 
     //% block="grid location of $sprite=variables_get(mySprite)"
+    //% group="Location" blockGap=8
     export function getLocation(sprite: Sprite): tiles.Location {
         //return tiles.getTileLocation(screenCoordinateToTile(s.x), screenCoordinateToTile(s.y));
         const d = sprite.data()
@@ -108,6 +112,7 @@ namespace grid {
     }
 
     //% block="$loc=mapgettile + cols $columns rows $rows"
+    //% group="Location" blockGap=8
     export function add(loc: tiles.Location, columns: number, rows: number): tiles.Location {
         const c = locCol(loc)
         const r = locRow(loc)
@@ -115,6 +120,7 @@ namespace grid {
     }
 
     //% block="move $sprite=variables_get(mySprite) by cols $columns rows $rows"
+    //% group="Movement" blockGap=8
     export function move(sprite: Sprite, columns: number, rows: number) {
         const loc = getLocation(sprite)
         const c = locCol(loc)
@@ -124,6 +130,7 @@ namespace grid {
     }
 
     //% block="swap $sprite1=variables_get(mySprite) and $sprite2=variables_get(mySprite2)"
+    //% group="Movement" blockGap=8
     export function swap(sprite1: Sprite, sprite2: Sprite) {
         let l1 = getLocation(sprite1)
         if (!l1)
@@ -135,7 +142,16 @@ namespace grid {
         place(sprite2, l1)
     }
 
+    //% block="sprite at $loc=mapgettile"
+    //% group="Location" blockGap=8
+    export function getSprite(loc: tiles.Location): Sprite {
+        const c = locCol(loc)
+        const r = locRow(loc)
+        return currentGrid().getSprite(c, r)
+    }
+
     //% block="grid move $sprite=variables_get(mySprite) with buttons"
+    //% group="Movement" blockGap=8
     export function moveWithButtons(sprite: Sprite) {
         controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
             move(sprite, 0, -1)
@@ -151,14 +167,8 @@ namespace grid {
         })
     }
 
-    //% block="get sprite at $loc=mapgettile"
-    export function getSprite(loc: tiles.Location): Sprite {
-        const c = locCol(loc)
-        const r = locRow(loc)
-        return currentGrid().getSprite(c, r)
-    }
-
     //% block="array of sprites in row $row"
+    //% group="Enumeration" blockGap=8
     export function rowSprites(row: number): Sprite[] {
         const g = currentGrid();
         let res: Sprite[] = []
@@ -173,6 +183,7 @@ namespace grid {
     }
 
     //% block="array of sprites in col $col"
+    //% group="Enumeration" blockGap=8
     export function colSprites(col: number): Sprite[] {
         const g = currentGrid();
         let res: Sprite[] = []
@@ -187,6 +198,7 @@ namespace grid {
     }
 
     //% block="array of all sprites on grid"
+    //% group="Enumeration" blockGap=8
     export function allSprites(): Sprite[] {
         const g = currentGrid();
         let res: Sprite[] = []
@@ -201,6 +213,7 @@ namespace grid {
     }
 
     //% block="$sprite=variables_get(mySprite) row"
+    //% group="Location" blockGap=8
     export function spriteRow(sprite: Sprite): number {
         const d = sprite.data();
         if (!d)
@@ -209,6 +222,7 @@ namespace grid {
     }
 
     //% block="$sprite=variables_get(mySprite) column"
+    //% group="Location" blockGap=8
     export function spriteCol(sprite: Sprite): number {
         const d = sprite.data();
         if (!d)
@@ -223,6 +237,7 @@ namespace grid {
     }
 
     //% block="snap $s=variables_get(mySprite) to grid"
+    //% group="Placement" blockGap=8
     export function snap(s: Sprite) {
         const loc = tiles.getTileLocation(screenCoordinateToTile(s.x), screenCoordinateToTile(s.y))
         place(s, loc)

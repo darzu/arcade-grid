@@ -21,7 +21,6 @@ namespace grid {
             }
         }
 
-        //% block
         public place(sprite: Sprite, loc: tiles.Location) {
             if (sprite.flags & sprites.Flag.Destroyed)
                 return
@@ -30,5 +29,19 @@ namespace grid {
             this.sprites[x][y] = sprite
             loc.place(sprite)
         }
+    }
+
+    //% block
+    //% blockSetVariable=spriteGrid
+    export function newSpriteGrid(): Grid {
+        const tm = game.currentScene().tileMap
+        if (!tm)
+            throw "No tilemap set; cannot create a Grid";
+        return new Grid(tm)
+    }
+
+    //% block="in %grid=variables_get(spriteGrid) place %sprite=variables_get(mySprite) on top of $loc=mapgettile"
+    export function place(grid: Grid, sprite: Sprite, loc: tiles.Location) {
+        return grid.place(sprite, loc);
     }
 }

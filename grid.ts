@@ -55,6 +55,8 @@ namespace grid {
             if (c === undefined || r === undefined)
                 return
             this.sprites[c][r] = undefined
+            d[DATA_COL] = undefined
+            d[DATA_ROW] = undefined
         }
     }
 
@@ -178,5 +180,17 @@ namespace grid {
         if (!d)
             return 0
         return d[DATA_COL] || 0
+    }
+
+    function screenCoordinateToTile(value: number) {
+        const tm = game.currentScene().tileMap;
+        if (!tm) return value >> 4;
+        return value >> tm.scale;
+    }
+
+    //% block="snap $s=variables_get(mySprite) to grid"
+    export function snap(s: Sprite) {
+        const loc = tiles.getTileLocation(screenCoordinateToTile(s.x), screenCoordinateToTile(s.y))
+        place(s, loc)
     }
 }

@@ -150,6 +150,20 @@ namespace grid {
         return g.sprites[col].filter(s => !!s)
     }
 
+    //% block="array of all sprites on grid"
+    export function allSprites(): Sprite[] {
+        const g = currentGrid();
+        let res: Sprite[] = []
+        for (let c = 0; c < g.columns; c++) {
+            for (let r = 0; r < g.rows; r++) {
+                let s = g.sprites[c][r]
+                if (s)
+                    res.push(s)
+            }
+        }
+        return res;
+    }
+
     //% block="$sprite=variables_get(mySprite) row"
     export function spriteRow(sprite: Sprite): number {
         const d = sprite.data();

@@ -58,6 +58,17 @@ namespace grid {
             d[DATA_COL] = undefined
             d[DATA_ROW] = undefined
         }
+
+        public getSprite(c: number, r: number): Sprite {
+            if (c < 0 || this.columns <= c)
+                return null
+            if (r < 0 || this.rows <= r)
+                return null
+            const s = this.sprites[c][r]
+            if (!s || s.flags & sprites.Flag.Destroyed)
+                return null
+            return s
+        }
     }
 
     function currentGrid(): Grid {
@@ -137,7 +148,7 @@ namespace grid {
         if (row < 0 || g.rows <= row)
             return res
         for (let c = 0; c < g.columns; c++) {
-            let s = g.sprites[c][row]
+            let s = g.getSprite(c, row)
             if (s)
                 res.push(s)
         }
@@ -147,9 +158,15 @@ namespace grid {
     //% block="array of sprites in col $col"
     export function colSprites(col: number): Sprite[] {
         const g = currentGrid();
+        let res: Sprite[] = []
         if (col < 0 || g.columns <= col)
-            return []
-        return g.sprites[col].filter(s => !!s)
+            return res
+        for (let r = 0; r < g.rows; r++) {
+            let s = g.getSprite(col, r)
+            if (s)
+                res.push(s)
+        }
+        return res;
     }
 
     //% block="array of all sprites on grid"
@@ -158,7 +175,7 @@ namespace grid {
         let res: Sprite[] = []
         for (let c = 0; c < g.columns; c++) {
             for (let r = 0; r < g.rows; r++) {
-                let s = g.sprites[c][r]
+                let s = g.getSprite(c, r)
                 if (s)
                     res.push(s)
             }

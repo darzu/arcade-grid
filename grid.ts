@@ -81,6 +81,16 @@ namespace grid {
         return _currentGrid;
     }
 
+    //% block="grid columns"
+    export function numColumns(): number {
+        return currentGrid().columns
+    }
+
+    //% block="grid rows"
+    export function numRows(): number {
+        return currentGrid().rows
+    }
+
     //% block="grid place %sprite=variables_get(mySprite) on top of $loc=mapgettile"
     export function place(sprite: Sprite, loc: tiles.Location) {
         currentGrid().place(sprite, loc);

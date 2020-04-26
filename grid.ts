@@ -84,7 +84,7 @@ namespace grid {
         return game.currentScene().tileMap.getTile(c, r)
     }
 
-    //% block="add $loc=mapgettile cols $columns rows $rows"
+    //% block="$loc=mapgettile + cols $columns rows $rows"
     export function add(loc: tiles.Location, columns: number, rows: number): tiles.Location {
         const c = locCol(loc)
         const r = locRow(loc)
@@ -126,5 +126,43 @@ namespace grid {
         controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
             move(sprite, 1, 0)
         })
+    }
+
+    //% block="array of sprites in row $row"
+    export function rowSprites(row: number): Sprite[] {
+        const g = currentGrid();
+        let res: Sprite[] = []
+        if (row < 0 || g.rows <= row)
+            return res
+        for (let c = 0; c < g.columns; c++) {
+            let s = g.sprites[c][row]
+            if (s)
+                res.push(s)
+        }
+        return res;
+    }
+
+    //% block="array of sprites in col $col"
+    export function colSprites(col: number): Sprite[] {
+        const g = currentGrid();
+        if (col < 0 || g.columns <= col)
+            return []
+        return g.sprites[col].filter(s => !!s)
+    }
+
+    //% block="$sprite=variables_get(mySprite) row"
+    export function spriteRow(sprite: Sprite): number {
+        const d = sprite.data();
+        if (!d)
+            return 0
+        return d[DATA_ROW] || 0
+    }
+
+    //% block="$sprite=variables_get(mySprite) column"
+    export function spriteCol(sprite: Sprite): number {
+        const d = sprite.data();
+        if (!d)
+            return 0
+        return d[DATA_COL] || 0
     }
 }

@@ -1,6 +1,4 @@
-# arcade-grid ![Build status badge](https://github.com/darzu/arcade-grid/workflows/MakeCode/badge.svg)
-
-
+# Sprite Grid ![Build status badge](https://github.com/darzu/arcade-grid/workflows/MakeCode/badge.svg)
 
 ## Use this extension
 

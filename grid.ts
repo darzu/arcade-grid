@@ -230,20 +230,6 @@ namespace grid {
         return dir
     }
 
-    //% block="array of sprites $dir=gridDirectionEditor of $loc=mapgettile || up to $dist tiles away"
-    //% expandableArgumentMode="toggle"
-    //% group="Enumeration" blockGap=8
-    export function lineAdjacentSprites(loc: tiles.Location, dir: CollisionDirection, dist: number = 1): Sprite[] {
-        const locs = lineAdjacentLocations(loc, dir, dist);
-        const g = currentGrid();
-        let res: Sprite[] = []
-        for (let l of locs) {
-            for (let s of g.getSprites(locCol(l), locRow(l)))
-                res.push(s)
-        }
-        return res
-    }
-
     //% block="array of all sprites on grid"
     //% group="Enumeration" blockGap=8
     export function allSprites(): Sprite[] {
@@ -257,6 +243,22 @@ namespace grid {
             }
         }
         return res;
+    }
+
+    //% block="array of sprites $dir of $loc=mapgettile || up to $dist tiles away"
+    //% dir.shadow=gridDirectionEditor
+    //% dir.def=CollisionDirection.Left
+    //% expandableArgumentMode="toggle"
+    //% group="Enumeration" blockGap=8
+    export function lineAdjacentSprites(loc: tiles.Location, dir: number, dist: number = 1): Sprite[] {
+        const locs = lineAdjacentLocations(loc, dir, dist);
+        const g = currentGrid();
+        let res: Sprite[] = []
+        for (let l of locs) {
+            for (let s of g.getSprites(locCol(l), locRow(l)))
+                res.push(s)
+        }
+        return res
     }
 
     //% block="$sprite=variables_get(mySprite) row"
@@ -294,10 +296,12 @@ namespace grid {
         }
     }
 
-    //% block="array of locations $dir=gridDirectionEditor of $loc=mapgettile || up to $dist tiles away"
+    //% block="array of locations $dir of $loc=mapgettile || up to $dist tiles away"
+    //% dir.shadow=gridDirectionEditor
+    //% dir.def=CollisionDirection.Left
     //% expandableArgumentMode="toggle"
     //% group="Enumeration" blockGap=8
-    export function lineAdjacentLocations(loc: tiles.Location, dir: CollisionDirection, dist: number = 1): tiles.Location[] {
+    export function lineAdjacentLocations(loc: tiles.Location, dir: number, dist: number = 1): tiles.Location[] {
         const g = currentGrid();
         let res: tiles.Location[] = []
         let col = locCol(loc)
@@ -318,8 +322,8 @@ namespace grid {
             }
         }
         else if (dir === CollisionDirection.Top) {
-            const minRows = Math.max(0, row - 1 - dist)
-            for (let r = row - 1; r > minRows; r--) {
+            const minRows = Math.max(0, row - dist)
+            for (let r = row - 1; r >= minRows; r--) {
                 res.push(tm.getTile(col, r))
             }
         }
@@ -330,8 +334,8 @@ namespace grid {
             }
         }
         else if (dir === CollisionDirection.Left) {
-            const minCols = Math.max(0, col - 1 - dist)
-            for (let c = col - 1; c > minCols; c--) {
+            const minCols = Math.max(0, col - dist)
+            for (let c = col - 1; c >= minCols; c--) {
                 res.push(tm.getTile(c, row))
             }
         }

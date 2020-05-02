@@ -14,7 +14,7 @@ namespace grid {
     let _currentGrid: Grid;
 
     export class Grid {
-        public sprites: Sprite[][];
+        public sprites: Sprite[][][];
         public columns: number;
         public rows: number;
 
@@ -38,8 +38,9 @@ namespace grid {
             if (y < 0 || this.rows <= y)
                 return
             this.remove(sprite);
-            this.remove(this.sprites[x][y])
-            this.sprites[x][y] = sprite
+            if (!this.sprites[x][y])
+                this.sprites[x][y] = []
+            this.sprites[x][y].push(sprite)
             const d = sprite.data()
             d[DATA_COL] = x
             d[DATA_ROW] = y
@@ -50,24 +51,37 @@ namespace grid {
             if (!sprite)
                 return
             const d = sprite.data()
+            // where are we
             const c: number = d[DATA_COL]
             const r: number = d[DATA_ROW]
             if (c === undefined || r === undefined)
                 return
-            this.sprites[c][r] = undefined
+            // erase our knowledge
             d[DATA_COL] = undefined
             d[DATA_ROW] = undefined
+
+            // remove from the grid
+            const spriteList = this.sprites[c][r]
+            if (spriteList) {
+                spriteList.removeElement(sprite)
+            }
         }
 
-        public getSprite(c: number, r: number): Sprite {
+        public getSprites(c: number, r: number): Sprite[] {
+            let res: Sprite[] = []
             if (c < 0 || this.columns <= c)
-                return null
+                return res
             if (r < 0 || this.rows <= r)
-                return null
-            const s = this.sprites[c][r]
-            if (!s || s.flags & sprites.Flag.Destroyed)
-                return null
-            return s
+                return res
+            let all = this.sprites[c][r]
+            if (!all)
+                return res
+            for (let s of all) {
+                if (!s || s.flags & sprites.Flag.Destroyed)
+                    continue
+                res.push(s)
+            }
+            return res
         }
     }
 
@@ -142,12 +156,12 @@ namespace grid {
         place(sprite2, l1)
     }
 
-    //% block="sprite at $loc=mapgettile"
-    //% group="Location" blockGap=8
-    export function getSprite(loc: tiles.Location): Sprite {
+    //% block="array of sprites at $loc=mapgettile"
+    //% group="Enumeration" blockGap=8
+    export function getSprites(loc: tiles.Location): Sprite[] {
         const c = locCol(loc)
         const r = locRow(loc)
-        return currentGrid().getSprite(c, r)
+        return currentGrid().getSprites(c, r)
     }
 
     //% block="grid move $sprite=variables_get(mySprite) with buttons"
@@ -175,8 +189,8 @@ namespace grid {
         if (row < 0 || g.rows <= row)
             return res
         for (let c = 0; c < g.columns; c++) {
-            let s = g.getSprite(c, row)
-            if (s)
+            let ss = g.getSprites(c, row)
+            for (let s of ss)
                 res.push(s)
         }
         return res;
@@ -190,8 +204,8 @@ namespace grid {
         if (col < 0 || g.columns <= col)
             return res
         for (let r = 0; r < g.rows; r++) {
-            let s = g.getSprite(col, r)
-            if (s)
+            let ss = g.getSprites(col, r)
+            for (let s of ss)
                 res.push(s)
         }
         return res;
@@ -204,8 +218,8 @@ namespace grid {
         let res: Sprite[] = []
         for (let c = 0; c < g.columns; c++) {
             for (let r = 0; r < g.rows; r++) {
-                let s = g.getSprite(c, r)
-                if (s)
+                let ss = g.getSprites(c, r)
+                for (let s of ss)
                     res.push(s)
             }
         }
@@ -236,10 +250,14 @@ namespace grid {
         return value >> tm.scale;
     }
 
-    //% block="snap $s=variables_get(mySprite) to grid"
+    //% block="snap $s=variables_get(mySprite) to grid || and stop $stop"
+    //% expandableArgumentMode="toggle"
     //% group="Placement" blockGap=8
-    export function snap(s: Sprite) {
+    export function snap(s: Sprite, stop = false) {
         const loc = tiles.getTileLocation(screenCoordinateToTile(s.x), screenCoordinateToTile(s.y))
         place(s, loc)
+        if (stop) {
+            s.vx = s.vy = s.ax = s.ay = 0;
+        }
     }
 }

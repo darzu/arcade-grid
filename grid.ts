@@ -234,51 +234,14 @@ namespace grid {
     //% expandableArgumentMode="toggle"
     //% group="Enumeration" blockGap=8
     export function lineAdjacentSprites(loc: tiles.Location, dir: CollisionDirection, dist: number = 1): Sprite[] {
+        const locs = lineAdjacentLocations(loc, dir, dist);
         const g = currentGrid();
         let res: Sprite[] = []
-        let col = locCol(loc)
-        let row = locRow(loc)
-        if (col < 0 || g.columns <= col)
-            return res
-        if (row < 0 || g.rows <= row)
-            return res
-        if (dist === 0)
-            return g.getSprites(col, row)
-        if (dist < 0)
-            return lineAdjacentSprites(loc, opposite(dir), -dist)
-        if (dir === CollisionDirection.Bottom) {
-            const maxRows = Math.min(g.rows, row + 1 + dist)
-            for (let r = row + 1; r < maxRows; r++) {
-                let ss = g.getSprites(col, r)
-                for (let s of ss)
-                    res.push(s)
-            }
+        for (let l of locs) {
+            for (let s of g.getSprites(locCol(l), locRow(l)))
+                res.push(s)
         }
-        else if (dir === CollisionDirection.Top) {
-            const minRows = Math.max(0, row - 1 - dist)
-            for (let r = row - 1; r > minRows; r--) {
-                let ss = g.getSprites(col, r)
-                for (let s of ss)
-                    res.push(s)
-            }
-        } 
-        else if (dir === CollisionDirection.Right) {
-            const maxCols = Math.min(g.columns, col + 1 + dist)
-            for (let c = col + 1; c < maxCols; c++) {
-                let ss = g.getSprites(c, row)
-                for (let s of ss)
-                    res.push(s)
-            }
-        }
-        else if (dir === CollisionDirection.Left) {
-            const minCols = Math.max(0, col - 1 - dist)
-            for (let c = col - 1; c > minCols; c--) {
-                let ss = g.getSprites(c, row)
-                for (let s of ss)
-                    res.push(s)
-            }
-        }
-        return res;
+        return res
     }
 
     //% block="array of all sprites on grid"
@@ -329,5 +292,49 @@ namespace grid {
         if (stop) {
             s.vx = s.vy = s.ax = s.ay = 0;
         }
+    }
+
+    //% block="array of locations $dir=gridDirectionEditor of $loc=mapgettile || up to $dist tiles away"
+    //% expandableArgumentMode="toggle"
+    //% group="Enumeration" blockGap=8
+    export function lineAdjacentLocations(loc: tiles.Location, dir: CollisionDirection, dist: number = 1): tiles.Location[] {
+        const g = currentGrid();
+        let res: tiles.Location[] = []
+        let col = locCol(loc)
+        let row = locRow(loc)
+        if (col < 0 || g.columns <= col)
+            return res
+        if (row < 0 || g.rows <= row)
+            return res
+        if (dist === 0)
+            return [loc]
+        if (dist < 0)
+            return lineAdjacentLocations(loc, opposite(dir), -dist)
+        const tm = game.currentScene().tileMap
+        if (dir === CollisionDirection.Bottom) {
+            const maxRows = Math.min(g.rows, row + 1 + dist)
+            for (let r = row + 1; r < maxRows; r++) {
+                res.push(tm.getTile(col, r))
+            }
+        }
+        else if (dir === CollisionDirection.Top) {
+            const minRows = Math.max(0, row - 1 - dist)
+            for (let r = row - 1; r > minRows; r--) {
+                res.push(tm.getTile(col, r))
+            }
+        }
+        else if (dir === CollisionDirection.Right) {
+            const maxCols = Math.min(g.columns, col + 1 + dist)
+            for (let c = col + 1; c < maxCols; c++) {
+                res.push(tm.getTile(c, row))
+            }
+        }
+        else if (dir === CollisionDirection.Left) {
+            const minCols = Math.max(0, col - 1 - dist)
+            for (let c = col - 1; c > minCols; c--) {
+                res.push(tm.getTile(c, row))
+            }
+        }
+        return res;
     }
 }
